@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>to my wife</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background-image: url('download (8).jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* --- SNOOPY PARTICLE SYSTEM --- */
+  #particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+  .particle { position: absolute; animation: floatUp linear infinite; opacity: 0; }
+  @keyframes floatUp {
+    0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* --- APOLOGY SCREEN --- */
+  #screen-proposal { width: 100%; display: flex; justify-content: center; z-index: 10; padding: 1rem; }
+  
+  .proposal-card {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border-radius: 30px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .meter-container { width: 100%; height: 10px; background: #eee; border-radius: 10px; margin-bottom: 1rem; overflow: hidden; border: 1px solid #fce4ec; }
+  #forgivenessFill { width: 0%; height: 100%; background: linear-gradient(90deg, #f48fb1, #e91e63); transition: width 0.4s ease; }
+  .meter-label { font-size: 0.75rem; color: #c2185b; font-weight: bold; margin-bottom: 0.5rem; display: block; }
+
+  .snoopy-img { width: 130px; height: auto; margin-bottom: 1rem; filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1)); }
+  .proposal-title { font-family: 'Playfair Display', serif; color: #c2185b; font-size: 1.1rem; line-height: 1.4; margin-bottom: 1.5rem; }
+  
+  .btn-container { position: relative; height: 160px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .btn-yes {
+    background: #4caf50; color: white; border: none; padding: 0.8rem 2.5rem; border-radius: 50px; 
+    cursor: pointer; font-size: 1.2rem; font-weight: bold; z-index: 15; 
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4); transition: 0.3s;
+  }
+  .btn-no {
+    background: white; color: #e91e63; border: 2px solid #f48fb1; padding: 0.6rem 2rem; 
+    border-radius: 50px; cursor: pointer; position: absolute; z-index: 5; top: 70px;
+    transition: 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .popup-text { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+  @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* --- HUB SCREEN --- */
+  #screen-hub {
+    display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #fce4ec 0%, #e1f5fe 100%); position: relative; overflow: hidden; perspective: 1200px;
+    padding: 1rem;
+  }
+
+  #hub-title { color:#c2185b; margin-bottom: 0.5rem; font-family: 'Playfair Display'; font-size: 1.6rem; text-align: center; z-index: 10; transition: 0.4s; }
+
+  .carousel-wrapper {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; width: 100%; padding: 1rem 0;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; cursor: grab; z-index: 5;
+  }
+  .carousel-wrapper::-webkit-scrollbar { display: none; }
+  .spacer { flex: 0 0 20vw; }
+
+  .hub-card {
+    scroll-snap-align: center; flex: 0 0 65vw; max-width: 300px; height: 350px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: transparent; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; transform-style: preserve-3d;
+  }
+
+  /* UPDATED HUB ICON STYLE[cite: 1] */
+  .hub-icon { 
+    width: 150px; /* Controls icon size on desktop[cite: 1] */
+    height: auto;
+    margin-bottom: 1rem; 
+    animation: aliveIcon 3s ease-in-out infinite; 
+    pointer-events: none; 
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+  }
+  
+  @keyframes aliveIcon {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.1); }
+  }
+
+  .zooming-in { transform: scale(5) translateZ(800px) !important; opacity: 0 !important; }
+  .zooming-out { animation: zoomOutEffect 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  @keyframes zoomOutEffect { 0% { transform: scale(3) translateZ(500px); opacity: 0; } 100% { transform: scale(1) translateZ(0); opacity: 1; } }
+
+  .hub-label { font-family: 'Playfair Display'; color: #c2185b; font-size: 1.8rem; font-weight: bold; pointer-events: none; }
+
+  /* --- DETAIL SCREENS --- */
+  .detail-screen { 
+    display: none; width: 100%; height: 100vh; flex-direction: column; align-items: center; 
+    padding: 5rem 1rem 1rem; z-index: 30; background: rgba(255, 245, 247, 0.98); 
+    overflow-y: auto; opacity: 0; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+    transform: scale(0.8);
+  }
+  .detail-screen.active { display: flex; opacity: 1; transform: scale(1); }
+
+  .back-btn { position: fixed; top: 1rem; left: 1rem; background: #c2185b; border: none; padding: 0.6rem 1rem; border-radius: 50px; cursor: pointer; color: white; font-weight: bold; z-index: 100; font-size: 0.9rem; }
+
+  /* --- PINK POLAROID GALLERY --- */
+  .gallery-track {
+    width: 300px;
+    height: 450px;
+    background: #fce4ec;
+    border: 8px solid #f8bbd0;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(194, 24, 91, 0.1), 0 15px 35px rgba(0,0,0,0.1);
+  }
+
+  .gallery-track::before, .gallery-track::after {
+    content: '🎀';
+    position: absolute;
+    font-size: 2rem;
+    z-index: 20;
+    top: -5px;
+  }
+  .gallery-track::before { left: 10px; }
+  .gallery-track::after { right: 10px; }
+
+  .photo-strip {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 20px 0;
+    transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .polaroid-frame {
+    flex: 0 0 380px;
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .polaroid-inner {
+    background: white;
+    padding: 12px 12px 40px 12px;
+    width: 240px;
+    height: 320px;
+    box-shadow: 0 10px 25px rgba(240, 98, 146, 0.3);
+    border: 1px solid #fce4ec;
+    transform: rotate(var(--rot));
+    position: relative;
+  }
+
+  .polaroid-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid #eee;
+  }
+
+  .polaroid-inner::after {
+    content: '✨';
+    position: absolute;
+    bottom: 5px;
+    right: 15px;
+    font-size: 1.2rem;
+  }
+
+  /* --- PINK MP3 PLAYER STYLES --- */
+  .mp3-player {
+    background: #f48fb1;
+    width: 280px;
+    height: 420px;
+    border-radius: 40px;
+    padding: 20px;
+    box-shadow: 0 20px 40px rgba(194, 24, 91, 0.3), inset 0 -5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 4px solid #fce4ec;
+  }
+
+  .mp3-screen {
+    background: #1a1a1a;
+    width: 100%;
+    height: 220px;
+    border-radius: 15px;
+    border: 10px solid #ad1457;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .mp3-header {
+    display: flex;
+    justify-content: space-between;
+    color: #1DB954;
+    font-family: monospace;
+    font-size: 0.7rem;
+  }
+
+  .mp3-info {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    background: #222;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  .scrolling-text {
+    display: inline-block;
+    color: #f48fb1;
+    font-family: monospace;
+    font-size: 0.8rem;
+    animation: scrollText 8s linear infinite;
+  }
+
+  @keyframes scrollText {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .mp3-controls {
+    margin-top: 25px;
+    width: 130px;
+    height: 130px;
+    background: #fce4ec;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+
+  .control-ring {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mp3-btn {
+    background: #c2185b;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 5;
+    transition: 0.2s;
+    box-shadow: 0 4px 0 #880e4f;
+  }
+
+  .mp3-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #880e4f;
+  }
+
+  .mp3-side-btns {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.6rem;
+    color: #ad1457;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  .vinyl-disk {
+    width: 110px; 
+    aspect-ratio: 1 / 1;
+    margin: 5px auto;
+    background-image: url('vinyl.png'); 
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 50%;
+    -webkit-mask-image: radial-gradient(circle, black 100%, transparent 100%);
+    mask-image: radial-gradient(circle, black 100%, transparent 100%);
+    animation: spin 4s linear infinite;
+    animation-play-state: paused;
+    box-shadow: 0 0 15px rgba(173, 20, 87, 0.4);
+    border: none;
+  }
+
+  .vinyl-disk.playing { animation-play-state: running; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  .progress-container { width: 100%; height: 5px; background: #333; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+  #songProgress { width: 0%; height: 100%; background: #1DB954; }
+
+  /* --- OTHER STYLES --- */
+ .message-content { 
+    background: white; 
+    padding: 2.5rem; 
+    border-radius: 30px; 
+    width: 100%; 
+    max-width: 450px; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
+    line-height: 1.8; /* Improves readability by spacing out lines */
+    text-align: justify; /* Keeps the text aligned neatly on both sides */
+    border: 1px solid #fce4ec;
+  }
+
+  .message-content h2 { 
+    color: #c2185b; 
+    margin-bottom: 1.5rem; 
+    font-family: 'Playfair Display', serif; 
+    font-size: 1.6rem; 
+    line-height: 1.3;
+    text-align: left;
+  }
+
+  .message-content p { 
+    font-size: 1.05rem; 
+    color: #444; 
+    margin-bottom: 1.2rem; /* Creates clean spacing between paragraphs */
+  }
+
+  .message-signature {
+    text-align: right; 
+    margin-top: 2rem; 
+    font-style: italic; 
+    color: #c2185b; 
+    font-weight: bold;
+    display: block;
+  }
+  
+  .heart-explosion {
+    position: fixed;
+    pointer-events: none;
+    z-index: 100;
+    font-size: 2rem;
+    animation: heartFly 1.5s ease-out forwards;
+  }
+
+  @keyframes heartFly {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+  }
+
+  @media (max-width: 767px) {
+    #hub-title { font-size: 1.4rem; padding: 0 10px; }
+    .hub-icon { width: 120px; } /* Slightly smaller for phones[cite: 1] */
+  }
+  
+  @media (min-width: 768px) {
+    #hub-title { font-size: 2.2rem; }
+    .mp3-player, .gallery-track { max-width: 450px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<audio id="ourSong" src="mysong.mp3" loop></audio>
+
+<!-- SCREEN 1: PROPOSAL -->
+<div id="screen-proposal">
+  <div class="proposal-card" id="proposalCard">
+    <span class="meter-label" id="meterLabel">Stress Level: 0%</span>
+    <div class="meter-container"><div id="forgivenessFill"></div></div>
+    <img src="Snoopy GIFs _ Tenor.gif" alt="Snoopy" class="snoopy-img" id="snoopyMain">
+    <h1 class="proposal-title">you seem stressed today, does this lessen your stress?</h1>
+    <div class="btn-container" id="btnContainer">
+      <button class="btn-yes" id="yesBtn" onclick="onYes(event)">Yes! 💖</button>
+      <button class="btn-no" id="noBtn" onclick="onNoClick()" onmouseover="moveNo()">No 🙁</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: HUB -->
+<div id="screen-hub">
+  <h2 id="hub-title">Click the OUR SONG for better experience 🎉</h2>
+  <div class="carousel-wrapper" id="carousel">
+    <div class="spacer"></div>
+    <!-- REPLACED EMOJIS WITH IMAGES[cite: 1] -->
+    <div class="hub-card" onclick="showDetail('gallery', this)"><img src="gallery_icon.png" class="hub-icon"><span class="hub-label">Gallery</span></div>
+    <div class="hub-card" onclick="showDetail('message', this)"><img src="message_icon.png" class="hub-icon"><span class="hub-label">Message</span></div>
+    <div class="hub-card" onclick="showDetail('song', this)"><img src="song_icon.png" class="hub-icon"><span class="hub-label">Our Song</span></div>
+    <div class="spacer"></div>
+  </div>
+  <p id="hub-hint" style="color:#c2185b; font-weight:bold; animation: pulse 2s infinite; z-index: 10; font-size: 0.8rem;">← Drag or Swipe to Explore →</p>
+</div>
+
+<!-- SCREEN 3: GALLERY -->
+<div id="screen-gallery" class="detail-screen">
+  <button class="back-btn" onclick="backToHub()">← Back</button>
+  <div class="gallery-track" onclick="slideNext()">
+    <div class="photo-strip" id="photoStrip">
+      <div class="polaroid-frame"><div class="polaroid-inner" style="--rot: -2deg"><img src="us1.jpg"></div></div>
+      <div class="polaroid-frame"><div class="polaroid-inner" style="--rot: 3deg"><img src="us2.jpg"></div></div>
+      <div class="polaroid-frame"><div class="polaroid-inner" style="--rot: -1deg"><img src="us3.jpg"></div></div>
+      <div class="polaroid-frame"><div class="polaroid-inner" style="--rot: 2deg"><img src="us4.jpg"></div></div>
+      <div class="polaroid-frame"><div class="polaroid-inner" style="--rot: -3deg"><img src="us5.jpg"></div></div>
+    </div>
+  </div>
+  <p style="color: #c2185b; margin-top: 1.5rem; font-weight: bold; text-align: center;">Tap our memories to scroll!💕</p>
+</div>
+
+<!-- SCREEN 4: MESSAGE -->
+<div id="screen-message" class="detail-screen">
+
+  <button class="back-btn" onclick="backToHub()">← Back</button>
+
+  <div class="message-content">
+
+    <h2>To my favorite person in the whole world,</h2>
+
+    <p>I really didn't mean to make you upset. I had so much time na to fix this and it came out really good—its a Snoopy themed gift site for my wife!</p>
+
+    <p>Its really cool actually WAHHHHHH THE BESTT ONEEE YETTTT REALLY PROUD OF THIS ONE LIKE REALLY.</p>
+
+    <p>Just so you know i reallyy loveee youuu okayy okayy you mean the absolute world to me. I hope this one becomes one of your fave kaysa sa mga nagawa ko before its improving na mwhehehehe</p>
+
+    <p>ILOVEYOUULOTSS and ALWAYSSSS MWAPPPPPPSSSSS.</p>
+
+    <span class="message-signature">— Your one and only BABA ♡</span>
+
+  </div>
+
+</div>
+
+<!-- SCREEN 5: SONG (MP3 PLAYER) -->
+<div id="screen-song" class="detail-screen">
+  <button class="back-btn" onclick="backToHub()">← Back</button>
+  <div class="mp3-player">
+    <div class="mp3-screen">
+      <div class="mp3-header"><span>12:00 PM</span><span>♥ VOL: 100%</span></div>
+      <div class="vinyl-disk" id="vinylDisk"></div> 
+      <div class="mp3-info"><div class="scrolling-text">Now Playing: I like Me Better — Husband & His Wife ♥</div></div>
+      <div class="progress-container"><div id="songProgress"></div></div>
+    </div>
+    <div class="mp3-controls">
+      <div class="control-ring">
+        <button class="mp3-btn" onclick="toggleSong()" id="playBtn">PLAY</button>
+        <div class="mp3-side-btns"><span>MENU</span><span>▶▶|</span></div>
+      </div>
+    </div>
+  </div>
+  <p style="color: #c2185b; margin-top: 1.5rem; font-weight: bold;">Press Play for the Vibes 🎀</p>
+</div>
+
+<script>
+// Particles logic[cite: 1]
+const pContainer = document.getElementById('particles');
+const emojis = ['⭐', '💖', '✨', '🌸', '🎀'];
+for (let i = 0; i < 20; i++) {
+  const p = document.createElement('span');
+  p.className = 'particle';
+  p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.fontSize = (Math.random() * 1 + 1) + 'rem';
+  p.style.animationDuration = (Math.random() * 8 + 6) + 's';
+  pContainer.appendChild(p);
+}
+
+// Forgiveness logic[cite: 1]
+let forgiveness = 0;
+function updateMeter() {
+  forgiveness = Math.min(forgiveness + 10, 100);
+  document.getElementById('forgivenessFill').style.width = forgiveness + '%';
+  document.getElementById('meterLabel').textContent = `Stress Level: ${forgiveness}%`;
+}
+
+function onNoClick() {
+  updateMeter();
+  
+  // ADD YOUR NEW MESSAGES HERE
+  const messages = [
+    "Why naman no",
+    "MWAPPPSSSSS",
+    "Kiss nalang kita lots",
+    "ILOVEEYOUUULOTSSS",
+    "Yes nalang kasi",
+    "YESSS BAAA"
+  ];
+  
+  // Selects a random message from the list
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+  const text = document.createElement('div');
+  text.className = 'popup-text'; 
+  text.textContent = randomMessage; // Uses the random message
+  
+  Object.assign(text.style, { 
+    position: 'fixed', 
+    left: Math.random()*70+15+'vw', 
+    top: Math.random()*70+15+'vh', 
+    background: 'white', 
+    padding: '8px', 
+    borderRadius: '10px', 
+    border: '2px solid #f48fb1', 
+    zIndex: 100, 
+    color: '#e91e63', 
+    fontSize: '0.8rem', 
+    fontWeight: 'bold' 
+  });
+  
+  document.body.appendChild(text);
+  setTimeout(() => text.remove(), 2000);
+}
+
+function moveNo() {
+  updateMeter();
+  const btn = document.getElementById('noBtn');
+  const rect = document.getElementById('btnContainer').getBoundingClientRect();
+  btn.style.left = Math.random() * (rect.width - btn.offsetWidth) + 'px';
+  btn.style.top = Math.random() * (rect.height - btn.offsetHeight) + 'px';
+}
+
+function createHeartExplosion(x, y) {
+  for(let i = 0; i < 15; i++) {
+    const heart = document.createElement('div');
+    heart.className = 'heart-explosion';
+    heart.innerHTML = '❤️';
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    heart.style.setProperty('--tx', (Math.random() * 400 - 200) + 'px');
+    heart.style.setProperty('--ty', (Math.random() * 400 - 200) + 'px');
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 1500);
+  }
+}
+
+function onYes(event) {
+  createHeartExplosion(event.clientX, event.clientY);
+  document.getElementById('snoopyMain').src = "download.gif"; 
+  const card = document.getElementById('proposalCard');
+  card.style.transform = "scale(1.05)";
+  setTimeout(() => {
+    card.style.transform = "scale(0)"; card.style.opacity = "0";
+    setTimeout(() => {
+      document.getElementById('screen-proposal').style.display = 'none';
+      document.getElementById('screen-hub').style.display = 'flex';
+    }, 600);
+  }, 1500);
+}
+
+// Gallery logic[cite: 1]
+let currentPhotoIndex = 0;
+const totalPhotos = 5;
+function slideNext() {
+  currentPhotoIndex = (currentPhotoIndex + 1) % totalPhotos;
+  document.getElementById('photoStrip').style.transform = `translateY(-${currentPhotoIndex * 380}px)`;
+}
+
+// Audio logic[cite: 1]
+const song = document.getElementById('ourSong');
+const disk = document.getElementById('vinylDisk');
+const playBtn = document.getElementById('playBtn');
+let noteInterval;
+
+function spawnNote() {
+  if (song.paused) return;
+  const note = document.createElement('span');
+  note.style.position = 'fixed';
+  note.textContent = ['🎵', '🎶', '❤️'][Math.floor(Math.random() * 3)];
+  note.style.left = (window.innerWidth / 2 + (Math.random() * 100 - 50)) + 'px';
+  note.style.top = (window.innerHeight / 2) + 'px';
+  note.style.fontSize = '1.2rem';
+  note.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-150px)', opacity: 0 }], { duration: 2000 });
+  document.body.appendChild(note);
+  setTimeout(() => note.remove(), 2000);
+}
+
+function toggleSong() {
+  if (song.paused) {
+    song.play();
+    disk.classList.add('playing');
+    playBtn.textContent = "PAUSE";
+    if(!noteInterval) noteInterval = setInterval(spawnNote, 500);
+  } else {
+    song.pause();
+    disk.classList.remove('playing');
+    playBtn.textContent = "PLAY";
+    clearInterval(noteInterval);
+    noteInterval = null;
+  }
+}
+
+song.ontimeupdate = () => { document.getElementById('songProgress').style.width = (song.currentTime / song.duration) * 100 + "%"; };
+
+// Navigation logic[cite: 1]
+function showDetail(id, element) { 
+  element.classList.add('zooming-in');
+  document.getElementById('hub-title').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('screen-hub').style.display = 'none'; 
+    const detailScreen = document.getElementById('screen-' + id);
+    detailScreen.style.display = 'flex';
+    setTimeout(() => detailScreen.classList.add('active'), 50);
+    element.classList.remove('zooming-in');
+  }, 600); 
+}
+
+function backToHub() { 
+  document.querySelectorAll('.detail-screen').forEach(screen => {
+    screen.classList.remove('active');
+    setTimeout(() => screen.style.display = 'none', 600);
+  }); 
+  setTimeout(() => {
+    const hub = document.getElementById('screen-hub');
+    hub.style.display = 'flex';
+    hub.classList.add('zooming-out');
+    document.getElementById('hub-title').style.opacity = '1';
+    setTimeout(() => hub.classList.remove('zooming-out'), 700);
+  }, 400);
+}
+
+// Carousel scroll scale[cite: 1]
+const carousel = document.getElementById('carousel');
+const hubCards = document.querySelectorAll('.hub-card');
+carousel.addEventListener('scroll', () => {
+  const centerX = carousel.scrollLeft + (carousel.offsetWidth / 2);
+  hubCards.forEach(card => {
+    const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
+    const distance = Math.abs(cardCenter - centerX);
+    const scale = Math.max(1 - (distance / carousel.offsetWidth), 0.7);
+    card.style.transform = `scale(${scale})`;
+  });
+});
+</script>
+</body>
+</html>
